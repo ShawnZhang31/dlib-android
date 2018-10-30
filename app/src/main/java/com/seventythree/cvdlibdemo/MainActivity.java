@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         mCameraBridgeViewBase = (CameraBridgeViewBase) findViewById(R.id.camera_surface);
         mCameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
-        mCameraBridgeViewBase.setCameraIndex(1);
+        mCameraBridgeViewBase.setCameraIndex(1); // 前置摄像头
         mCameraBridgeViewBase.setCvCameraViewListener(this);
     }
 
@@ -142,14 +142,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-//        Mat grayMat = inputFrame.gray();
-////        if (this.getResources().getConfiguration().orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-////        {
-////            Core.rotate(grayMat,grayMat, Core.ROTATE_90_CLOCKWISE);
-////        }
-//        cannyDetect(grayMat.getNativeObjAddr());
-//        return  grayMat;
-
         Mat frame = inputFrame.rgba();
         faceDetect(frame.getNativeObjAddr());
         return frame;

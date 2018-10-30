@@ -38,14 +38,14 @@ extern "C" JNIEXPORT void JNICALL Java_com_seventythree_cvdlibdemo_MainActivity_
         JNIEnv *env,
         jobject thiz,
         jlong matAddr) {
-    cv::Mat &img = *(cv::Mat *) matAddr;
+    cv::Mat &img = *(cv::Mat *) matAddr; // 这里的img必须使用&定义，因为我们操作的是内存，否则修改之后的值无法传回给MainActivity
     if (img.channels() ==4)
-        cv::cvtColor(img, img, CV_RGBA2BGR);
+        cv::cvtColor(img, img, CV_RGBA2BGR);    // onCameraFrame返回的RGB图像是RGBA通道的，这与我们需要的BGR通道不相符，需要转换
 
     cv::Mat rotatedMat = img.clone();
-    cv::rotate(rotatedMat, rotatedMat, ROTATE_90_COUNTERCLOCKWISE);
+    cv::rotate(rotatedMat, rotatedMat, ROTATE_90_COUNTERCLOCKWISE); // OpenCV本身的问题，造成获取的图像旋转了90°，而dlib只能识别竖直的人头，所以我们需要逆时针旋转回来
 
-    dlib::cv_image<bgr_pixel> dlibImg(rotatedMat);
+    dlib::cv_image<bgr_pixel> dlibImg(rotatedMat); //dlib的facedetector只接受cv_image<bgr_pixel>图像格式
 //
     std::vector<dlib::rectangle> faceRects = faceDetector(dlibImg);
     if (faceRects.size() > 0) {
@@ -64,7 +64,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_seventythree_cvdlibdemo_MainActivity_
         LOGD("未能检测到人脸");
     }
 
-    cv::cvtColor(img, img, CV_BGR2RGBA);
+    cv::cvtColor(img, img, CV_BGR2RGBA); //JavaCameraView显示图像需要RGBA通道
 }
 
 
