@@ -16,7 +16,7 @@
 ### 编译Dlib
   1. 编译环境准备(以我个人电脑为例)
      - 操作系统: MacOS 10.14 
-     - NDK版本:R16C
+     - NDK版本:R16B
      - Dlib版本:19.15
   2. 创建一个dlib4android文件夹并在该文件夹下创建一个jni文件件   
     文件夹结构如下:   
@@ -77,10 +77,25 @@
         APP_CPPFLAGS += -DDLIB_NO_GUI_SUPPORT=1 #交叉编译项 dlib提供了基于xquart的图形界面，该界面不支持Android，关闭该界面的支持
         APP_CPPFLAGS += -DLIB_PNG_SUPPORT  #交叉编译项 支持读取PNG图像
         APP_CPPFLAGS += -DLIB_JPEG_SUPPORT #交叉编译项 支持读取JPG图像
-        APP_ABI := x86_64, x86, armeabi-v7a, arm64-v8a #指定需要编译的ABI版本，如果设置为all，则编译所有的ABI平台
+        APP_ABI := x86_64, x86, armeabi-v7a, arm64-v8a, mips64, mips#指定需要编译的ABI版本，目前暂不支持armeabi版本
         APP_PLATFORM := android-16 #编译的SDK版本
-        NDK_TOOLCHAIN_VERSION := clang #工具链
+        NDK_TOOLCHAIN_VERSION := clang #工具链,如果是在Windows上编译，需要将此行注释掉
      ```
+     **注意:**   
+        - 如果在Windows上编译，需要将 **NDK_TOOLCHAIN_VERSION := clang**注释掉，具体原因未知
+        - 目前编译armeabi平台会出现如下错误:
+              ```c++
+                dlib/all/../base64/../threads/thread_pool_extension.h:456:26: error:
+                      no type named 'exception_ptr' in namespace 'std'; did you mean 'exception'?
+                            mutable std::exception_ptr eptr; // non-null if the task threw an exception
+                                    ~~~~~^~~~~~~~~~~~~
+                                         exception
+                 # 已经等等的类似错误
+              ```  
+            关于该错误的讨论可以见：https://github.com/davisking/dlib/issues/596  
+            
+            这是因为NDK所包含的libstd++并不是完成版本，不能支持C++11的所有特性，在交叉编译的时候容易出现问题。好在Android已经打算弃用armeabi，所以放心大胆的丢弃armeabi就行了。
+           
    7. 编译  
       使用终端(Mac)或者CMD(Windows)cd进入jni文件夹，运行你的NDK安装目录下的ndk-build，此时ndk开始编译。  
       不过你很快就会遇到错误而终止，错误提示可能如下:  
