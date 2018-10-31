@@ -367,7 +367,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_seventythree_cvdlibdemo_MainActivity_
   ```
   我的ndk的release标志位-Os或者-O2，所以我选择了cppFlags "-std=c++11 -frtti -fexceptions -Os -O2".此时再build就一切正常了。不过此时还是回比较慢，大概15FPS左右，要想更快就要考虑图像对齐、降采样、跳帧了。
   ![demo](demo.png)
-## Dlib的其他的问题与taolun
+## Dlib的其他的问题与讨论
 截止目前发现OpenCV和Dlib在Android上都有点问题。而且Android采用了大量开源的东西，组件之间不同的版本之间兼容性也是非常差的，有时候编译不回来的时候不妨按照别人编译成功的软件环境再试试。
 1. dlib进行面部关键点检测的时候.dat文件的加载问题   
 .dat文件需要放在res/raw文件夹下，使用dlib的deserialize的之前，需要将其拷贝到app的目录下，并将文件的绝对路径传给deserialize。但是在拷贝的时候会发现，把.dat文件放在res/raw文件下build工程的时候，会出现**Cause: invalid code lengths set**这样一个莫名其妙的错误。这是由于Java Maven的Bug造成的，虽然.dat是二进制文件，但是Maven认为其文件编码格式有问题，不允许通过。这个bug暂时无解。只能将.dat文件压缩为zip文件，拷贝到制定的位置之后再解压出来。
